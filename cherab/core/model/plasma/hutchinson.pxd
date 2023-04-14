@@ -16,18 +16,23 @@
 # See the Licence for the specific language governing permissions and limitations
 # under the Licence.
 
-from libc.math cimport M_PI
+# cython: language_level=3
 
-cdef:
-    double RECIP_2_PI
-    double RECIP_4_PI
-    double DEGREES_TO_RADIANS
-    double RADIANS_TO_DEGREES
-    double ATOMIC_MASS
-    double ELEMENTARY_CHARGE
-    double SPEED_OF_LIGHT
-    double PLANCK_CONSTANT
-    double ELECTRON_CLASSICAL_RADIUS
-    double ELECTRON_REST_MASS
-    double RYDBERG_CONSTANT_EV
-    double VACUUM_PERMITTIVITY
+from numpy cimport ndarray
+from cherab.core.atomic cimport FreeFreeGauntFactor
+from cherab.core.plasma cimport PlasmaModel
+
+
+cdef class HutchinsonBremsstrahlung(PlasmaModel):
+
+    cdef:
+        FreeFreeGauntFactor _gaunt_factor
+        bint _user_provided_gaunt_factor
+        ndarray _species_charge, _species_density
+        double[::1] _species_density_mv, _species_charge_mv
+
+    cdef double _bremsstrahlung(self, double wvl, double te, double ne)
+
+    cdef int _populate_cache(self) except -1
+
+
